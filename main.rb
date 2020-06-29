@@ -46,5 +46,3 @@ def select_user_ids(tag_ids)
   end
   user_ids
 end
-
-lambda_handler(event: "{\"pin\":{\"id\":1,\"userId\":1,\"title\":\"pin1\",\"description\":\"pin1 description\",\"imageUrl\":\"https://pinko-bucket.s3-ap-northeast-1.amazonaws.com/pins/009174cf-c4fe-4a49-a4b2-cb24a98887c9.png\",\"isPrivate\":false},\"tags\":[{\"id\":9,\"tag\":\"neko\"},{\"id\":1,\"tag\":\"sushi\"},{\"id\":12,\"tag\":\"inukkoro\"}]}", context: "")
