@@ -1,5 +1,6 @@
 require 'mysql2'
 require 'json'
+require 'aws-sdk'
 
 def lambda_handler(event:, context:)
   json = JSON.parse(event)
@@ -9,7 +10,7 @@ def lambda_handler(event:, context:)
     tag_ids << tag["id"]
   end
 
-  p select_user_ids(tag_ids)
+  insert_dynamo(json['pin'], select_user_ids(tag_ids))
 end
 
 def build_where_clause(tag_ids)
@@ -28,7 +29,13 @@ def build_where_clause(tag_ids)
 end
 
 def select_user_ids(tag_ids)
-  client = Mysql2::Client.new(host: '127.0.0.1', username: 'test_user', password: 'password', database: 'test_db')
+  client = Mysql2::Client.new(
+    host: ENV['MYSQL_HOST'],
+    username: ENV['MYSQL_USER'],
+    password: ENV['MYSQL_PASSWORD'],
+    database: ENV['MYSQL_DATABASE'],
+    port: ENV['MYSQL_PORT']
+  )
 
   query = "
     SELECT
@@ -45,4 +52,26 @@ def select_user_ids(tag_ids)
     user_ids << row['user_id']
   end
   user_ids
+end
+
+def insert_dynamo(pin, user_ids)
+  dynamoDB = Aws::DynamoDB::Resource.new(region: 'ap-northeast-1')
+  table = dynamoDB.table('home-pins')
+
+  user_ids.each do |user_id|
+    table.put_item({
+      item:
+        {
+          "user_id": user_id,
+          "pin_id": pin['id'],
+          "title": pin['title'],
+          "description": pin['description'],
+          "post_user_id": pin['userId'],
+          "image_url": pin['imageUrl'],
+          "is_private": pin['isPrivate'],
+          "created_at": pin['createdAt'],
+          "updated_at": pin['updatedAt']
+        }
+      })
+  end
 end
