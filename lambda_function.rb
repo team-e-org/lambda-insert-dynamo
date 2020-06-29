@@ -1,16 +1,13 @@
 require 'mysql2'
-require 'json'
 require 'aws-sdk'
 
 def lambda_handler(event:, context:)
-  json = JSON.parse(event)
-
   tag_ids = []
-  json["tags"].each do |tag|
+  event["tags"].each do |tag|
     tag_ids << tag["id"]
   end
 
-  insert_dynamo(json['pin'], select_user_ids(tag_ids))
+  insert_dynamo(event['pin'], select_user_ids(tag_ids))
 end
 
 def build_where_clause(tag_ids)
