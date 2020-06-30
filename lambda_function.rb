@@ -53,7 +53,7 @@ end
 
 def insert_dynamo(pin, user_ids)
   dynamoDB = Aws::DynamoDB::Resource.new(region: 'ap-northeast-1')
-  table = dynamoDB.table('home-pins')
+  table = dynamoDB.table(ENV['DYNAMODB_TABLE'])
 
   user_ids.each do |user_id|
     table.put_item({
