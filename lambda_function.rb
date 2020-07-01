@@ -1,13 +1,20 @@
 require 'mysql2'
 require 'aws-sdk'
+require 'logger'
 
 def lambda_handler(event:, context:)
+  logger = Logger.new(STDOUT)
+  logger.info(event)
+
   tag_ids = []
   event["tags"].each do |tag|
     tag_ids << tag["id"]
   end
 
-  insert_dynamo(event['pin'], select_user_ids(tag_ids))
+  user_ids = select_user_ids(tag_ids)
+  logger.info("user_ids: #{user_ids}")
+
+  insert_dynamo(event['pin'], user_ids)
 end
 
 def build_where_clause(tag_ids)
