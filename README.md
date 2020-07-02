@@ -50,3 +50,5 @@ In docker container
 `cp -a /usr/lib64/mysql/*.so.* /var/task/lib/`
 
 `zip -q -r deploy.zip .`
+
+`aws lambda update-function-code --function-name insertDynamo --zip-file fileb://deploy.zip`
